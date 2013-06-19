@@ -1,0 +1,1 @@
+<html><body>You are being <a href="https://raw.github.com/borisyankov/DefinitelyTyped/master/requirejs/require.d.ts">redirected</a>.</body></html>
