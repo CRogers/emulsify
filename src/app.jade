@@ -1,5 +1,12 @@
 !!! 5
-html
+html(ng-app)
 	head
-		script(data-main="scripts/main", src="scripts/lib/require-2.1.6/require.js")
-	body
+		title Emulsify
+		link(rel="stylesheet", href="styles/app.css")
+		script(src="scripts/lib/angularjs/angular.min.js")
+		script(src="scripts/machine.js")
+		script(src="scripts/main.js")
+	body(ng-controller="BodyCtrl")
+		#container
+			#blockDiag(ng-controller="MemoryCtrl")
+				.block(ng-repeat="cell in cells", style="width: {{100/cells.length}}%; background-color: rgb({{cell}},0,0);") &nbsp;
