@@ -6,7 +6,19 @@ html(ng-app)
 		script(src="scripts/lib/angularjs/angular.min.js")
 		script(src="scripts/machine.js")
 		script(src="scripts/main.js")
-	body(ng-controller="BodyCtrl")
+	body(ng-controller="Main.BodyCtrl")
 		#container
-			#blockDiag(ng-controller="MemoryCtrl")
-				.block(ng-repeat="cell in cells", style="width: {{100/cells.length}}%; background-color: rgb({{cell}},0,0);") &nbsp;
+			.machine(ng-controller="Machine.MachineCtrl")
+				input(type="button", value="Step", ng-click="step()")
+				{{reg[0]}}
+				h2 Registers:
+				table
+					thead
+						tr
+							td Register Number
+							td Value
+					tbody
+						tr(ng-repeat="rn in range(reg.length)")
+							td {{rn}}
+							td {{reg[rn]}}
+			

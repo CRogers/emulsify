@@ -4,6 +4,7 @@ var path = require('path');
 var stylus = require('stylus');
 var nib = require('nib');
 var jade = require('jade');
+var fs = require('fs');
 
 var app = express();
 const APP_DIR = path.resolve(path.join('..','src'));
@@ -25,13 +26,16 @@ function styleloc(loc) {
 	return path.join(STYLES_DIR, loc);
 }
 
-function runProcess(res, exe, loc, outloc) {
+function runProcess(res, exe, loc, outloc, midfunc) {
 	exec(exe + ' ' + loc, function(err, stdout, stderr) {
 		if(stderr !== '') {
 			res.send("Error:\n\n" + stderr);
 			res.status(500);
 		}
 		else {
+			if (midfunc) {
+				midfunc();
+			}
 			res.sendfile(outloc);
 		}
 	});
@@ -52,9 +56,13 @@ app.get('/:name.html', function(req, res) {
 });
 
 app.get('/scripts/:name.js', function(req, res) {
-	var loc = scriptloc(req.params.name) + '.ts';
+	var nloc = scriptloc(req.params.name);
+	var loc = nloc + '.ts';
+	var intermediateOut = nloc + '.js';
 	var outloc = path.join(SCRIPTS_OUT_DIR, req.params.name) + '.js';
-	runProcess(res, 'tsc --out ' + outloc, loc, outloc);
+	runProcess(res, 'tsc', loc, outloc, function(){
+		fs.renameSync(intermediateOut, outloc);
+	});
 });
 
 app.configure(function(){

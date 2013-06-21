@@ -1,10 +1,33 @@
-interface MemoryScope {
-	cells: number[];
-}
+/// <reference path="main.ts" />
 
-function MemoryCtrl($scope: MemoryScope) {
-	$scope.cells = new Array(10);
-	for (var i = 0; i < $scope.cells.length; i++) {
-		$scope.cells[i] = Math.floor(Math.random()*255);
+module Machine {
+
+	enum Register {
+		Zero,
+		PC
 	}
+
+	export interface MachineScope extends Main.BodyScope {
+		reg: Uint32Array;
+		mem: Uint8Array;
+		step();
+	}
+
+	export function MachineCtrl($scope: MachineScope) {
+		$scope.mem = new Uint8Array(1024*4);
+		$scope.reg = new Uint32Array(32);
+
+		console.log($scope.reg);
+		console.log($scope);
+
+		$scope.step = function() {
+			var reg = $scope.reg;
+			var mem = $scope.mem;
+
+			reg[Register.PC] += 4;
+			var val = mem[reg[Register.PC]];
+			console.log(val);
+		}
+	}
+
 }
