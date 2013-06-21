@@ -1,0 +1,104 @@
+start = instrs
+
+s = (' '/'\t')*
+cs = s ',' s
+num = n:[0-9]+ { return parseInt(n.join('')) }
+nl = '\r'? '\n'
+nls = s nl [\n\r \t]*
+
+instrs
+  = is:instr* { return is }
+
+instr 
+  = mnemonic:instr3reg s rd:reg cs rs:reg cs rt:reg nl
+     { return {mnemonic: mnemonic,  rs: rs, rt: rt, rd: rd} }
+  / mnemonic:instr2reg1imm s rs:reg cs rt:reg cs imm:num nl
+     { return {mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
+  / mnemonic:instr1reg1imm s rt:reg cs imm:num nl
+     { return {mnemonic: mnemonic, rt:rt, imm:imm } }
+  / mnemonic:instr2reg s rs:reg cs rt:reg nl
+     { return {mnemonic: mnemonic, rs:rs, rt:rt } }
+  / mnemonic:instr1reg_rd s rd:reg nl
+     { return {mnemonic: mnemonic, rd:rd } }
+  / mnemonic:instr1reg_rs s rs:reg nl
+     { return {mnemonic: mnemonic, rs:rs } }
+  / mnemonic:instr_branch s rs:reg cs rt:reg cs imm:num nl
+     { return {mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
+  / mnemonic:instr_offset s rt:reg cs imm:num '(' rs:reg ')' nl
+     { return {mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
+
+instr3reg
+	= mnemonic:('sllv'
+	/ 'sll'
+	/ 'srlv'
+	/ 'srl'
+	/ 'srav'
+	/ 'sra'
+	/ 'addu'
+	/ 'add'
+	/ 'subu'
+	/ 'sub'
+	/ 'and'
+	/ 'or'
+	/ 'xor'
+	/ 'nor'
+	/ 'sltu'
+	/ 'slt') { return mnemonic }
+
+instr2reg1imm
+	= mnemonic:('addiu'
+	/ 'addi'
+	/ 'slti'
+	/ 'andi'
+	/ 'ori') { return mnemonic }
+
+instr1reg1imm
+	= mnemonic:'lui' {return mnemonic}
+
+instr2reg
+	= mnemonic:('mult'
+	/ 'multu'
+	/ 'div'
+	/ 'divu') { return mnemonic }
+
+instr1reg_rd
+	= mnemonic:('mfhi'
+	/ 'mflo'
+	/ 'jr') { return mnemonic }
+
+instr1reg_rs
+	= mnemonic:'jr' { return mnemonic }
+
+instr1addr
+	= mnemonic:('j'
+	/ 'jal') { return mnemonic }
+
+instr_branch
+	= mnemonic:('beq'
+	/ 'bne') {return mnemonic}
+	
+	/*/ 'jalr' */
+
+instr_offset
+	= mnemonic:('lb'
+	/ 'lh'
+	/ 'lw'
+	/ 'lbu'
+	/ 'lhu'
+	/ 'sb'
+	/ 'sh'
+	/ 'sw') {return mnemonic}
+
+reg
+	= name:('zero'
+	/ 'at'
+	/ 'v0' / 'v1'
+	/ 'a0' / 'a1' / 'a2' / 'a3'
+	/ 't0' / 't1' / 't2' / 't3' / 't4' / 't5' / 't6' / 't7'
+	/ 's0' / 's1' / 's2' / 's3' / 's4' / 's5' / 's6' / 's7'
+	/ 't8' / 't9'
+	/ 'k0' / 'k1'
+	/ 'gp'
+	/ 'sp'
+	/ 'fp'
+	/ 'ra') { return name }

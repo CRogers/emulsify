@@ -107,8 +107,8 @@ module Machine {
 	var B16 = 0xffff;
 	var B26 = 0x3ffffff;
 
-	export function decodeInstruction(arr: Uint32Array, i: number): Inst {
-		var a = arr[i];
+	export function decodeInstruction(word: number): Inst {
+		var a = word;
 
 		var inst = new Inst();
 
@@ -156,8 +156,8 @@ module Machine {
 		var reg = new Uint32Array(32);
 
 		function getPC() { return PC[0]; }
-		function setPC(v) { PC[0] = v; }
-		function incrPC(i) { PC[0] += i; }
+		function setPC(v) { return PC[0] = v; }
+		function incrPC(i) { return PC[0] += i; }
 
 		function executeInstruction(i: Inst) {
 			if (i.type === InstType.R) {
@@ -214,8 +214,10 @@ module Machine {
 
 
 		function step() {
+			var instWord = mem[PC[0]];
+			var inst = decodeInstruction(instWord);
+			executeInstruction(inst);
 			incrPC(4);
-			var val = mem[getPC()];
 		}
 
 		$scope.mem = mem;
