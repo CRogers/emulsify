@@ -2,23 +2,46 @@
 html(ng-app)
 	head
 		title Emulsify
+		link(rel="stylesheet", href="scripts/lib/bootstrap/css/bootstrap.min.css")
 		link(rel="stylesheet", href="styles/app.css")
+		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")
 		script(src="scripts/lib/angularjs/angular.min.js")
 		script(src="scripts/machine.js")
 		script(src="scripts/main.js")
 	body(ng-controller="Main.BodyCtrl")
-		#container
-			.machine(ng-controller="Machine.MachineCtrl")
-				input(type="button", value="Step", ng-click="step()")
-				{{reg[0]}}
-				h2 Registers:
-				table
-					thead
-						tr
-							td Register Number
-							td Value
-					tbody
-						tr(ng-repeat="rn in range(reg.length)")
-							td {{rn}}
-							td {{reg[rn]}}
+		.container
+			.row.machine(ng-controller="Machine.MachineCtrl")
+				.span12
+					h1 Emulsify
+					button.btn.btn-primary(ng-click="step()") Step
+				.span3
+					h2 Registers:
+
+					table.table.table-bordered.table-hover
+						thead
+							tr
+								td Number
+								td Name
+								td Value
+						tbody
+							tr
+								td
+								td PC
+								td {{getPC()}}
+							tr(ng-repeat="rn in range(reg.length)")
+								td {{rn}}
+								td {{Register._map[rn]}}
+								td {{reg[rn]}}
+				.span3
+					h2 Memory:
+					table.table.table-bordered.table-hover
+						thead
+							tr
+								td Address
+								td Value
+						tbody
+							tr(ng-repeat="a in range(mem.length)")
+								td {{a}}
+								td {{mem[a]}}
+
 			
