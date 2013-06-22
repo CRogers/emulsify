@@ -18,7 +18,7 @@ module Assembler {
 		parser = PEG.buildParser(grammar);
 	});
 
-	export function assembleInstruction(instr:any) {
+	export function assembleInstruction(instr:any):number {
 		var r = 0;
 		if (instr.rs !== undefined) {
 			r |= +Register[instr.rs] << 21;
@@ -56,20 +56,20 @@ module Assembler {
 		return r;
 	}
 
-	export function assemble(str:string) {
+	export function assemble(str:string):Array<number> {
 		var pinsts = parser.parse(str);
 		return pinsts.map(assembleInstruction);
 	}
 
-	function disArg(value: any, first: bool = false) {
+	function disArg(value: any, first: bool = false):string {
 		return (first ? " " : ", ") + value.toString();
 	}
 
-	function disReg(reg: number, first: bool = false) {
+	function disReg(reg: number, first: bool = false):string {
 		return disArg(Register[reg], first);
 	}
 
-	function disRegs(...regs: number[]) {
+	function disRegs(...regs: number[]):string {
 		if (regs.length === 0) return "";
 		var ret = disReg(regs[0], true);
 		for (var i = 1; i < regs.length; i++) {
@@ -78,7 +78,7 @@ module Assembler {
 		return ret;
 	}
 
-	export function disassembleInstruction(instrWord: number) {
+	export function disassembleInstruction(instrWord: number):string {
 		var i = Machine.decodeInstruction(instrWord);
 		switch (i.type) {
 			case InstType.R:

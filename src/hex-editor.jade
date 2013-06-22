@@ -1,11 +1,14 @@
 .hex(ng-controller='HexEditor.HexEditorCtrl')
-	button.btn.btn-primary(ng-click="curRow = curRow + cols") Next Row
+	button.btn.btn-primary(ng-click="incrCurRow(-1)") Next Row
 	table.hex.table.table-bordered.table-hover
 		thead
 			tr
 				td Address
-				td(ng-repeat="col in range(cols)") {{hex(col, 2)}}
+				td(ng-repeat="col in range(cols)") {{hex(col, Math.floor(cols/16))}}
+				td Output
 		tbody
 			tr(ng-repeat="row in range(rows)")
-				td {{hex(curRow+row*cols)}}
-				td(ng-repeat="col in range(cols)") {{getByte(row, col)}}
+				td {{hex(rowStartLoc(row))}}
+				td(ng-repeat="col in range(cols)", style="background: rgb({{230+Math.floor(getByte(row,col)/10)}},255,255)")
+					| {{getHexByte(row, col)}}
+				td(ng-bind-html-unsafe="instrOutput(row)")

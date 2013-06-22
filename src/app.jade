@@ -4,22 +4,16 @@ html(ng-app)
 		title Emulsify
 		link(rel="stylesheet", href="scripts/lib/bootstrap/css/bootstrap.min.css")
 		link(rel="stylesheet", href="styles/app.css")
-		script(src="scripts/lib/jquery/jquery-2.0.2.min.js")
-		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")
-		script(src="scripts/lib/angularjs/angular.min.js", async)
-		script(src="scripts/lib/closure/long.js", async)
-		script(src="scripts/lib/peg.js/peg.min.js", async)
-		script(src="scripts/grabber.js")
-		script(src="scripts/machine.js")
-		script(src="scripts/assembler.js")
-		script(src="scripts/hex-editor.js")
-		script(src="scripts/main.js")
 	body(ng-controller="Main.BodyCtrl")
-		.container
-			.row.machine(ng-controller="Machine.MachineCtrl")
+		.machine(ng-controller="Machine.MachineCtrl")
+			.row
 				.span12
 					h1 Emulsify
 					button.btn.btn-primary(ng-click="step()") Step
+			.row
+				.span12
+					h2 Memory:
+					div(ng-include="'hex-editor.html'")
 				.span3
 					h2 Registers:
 
@@ -38,6 +32,14 @@ html(ng-app)
 								td {{rn}}
 								td {{Register[rn]}}
 								td {{reg[rn]}}
-				.span3
-					h2 Memory:
-					div(ng-include="'hex-editor.html'")	
+
+		script(src="scripts/lib/jquery/jquery-2.0.2.min.js")
+		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")
+		script(src="scripts/lib/angularjs/angular.min.js", async)
+		script(src="scripts/lib/closure/long.js", async)
+		script(src="scripts/lib/peg.js/peg.min.js", async)
+		script(src="scripts/grabber.js")
+		script(src="scripts/machine.js")
+		script(src="scripts/assembler.js")
+		script(src="scripts/hex-editor.js")
+		script(src="scripts/main.js")

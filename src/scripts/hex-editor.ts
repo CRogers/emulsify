@@ -1,4 +1,5 @@
 /// <reference path="machine.ts" />
+/// <reference path="assembler.ts" />
 
 module HexEditor {
 
@@ -17,24 +18,82 @@ module HexEditor {
 	export interface HexEditorScope extends Machine.MachineScope {
 		rows: number;
 		cols: number;
-		curRow: number;
+		getCurRow():number;
+		setCurRow(n: number);
+		incrCurRow(offset: number);
 		hex(n: number):string;
-		getByte(row: number, col: number):string;
+		rowStartLoc(row: number):number;
+		rowColLoc(row: number, col: number):number;
+		getByte(row: number, col: number):number;
+		getHexByte(row: number, col: number):string;
+		asciiOutput(row: number):string;
+		instrOutput(row: number):string;
 	}
 
 	export function HexEditorCtrl($scope: HexEditorScope) {
 		$scope.cols = 16;
-		$scope.rows = 32;
-		$scope.curRow = 10;
+		$scope.rows = 24;
+		var curRow = 10;
+
+		$scope.getCurRow = function():number {
+			return curRow;
+		}
+
+		$scope.setCurRow = function(n: number) {
+			curRow = Math.max(0, Math.min(n, Math.ceil($scope.mem.length/$scope.cols)-$scope.rows))
+		}
+
+		$scope.incrCurRow = function(offset: number) {
+			$scope.setCurRow($scope.getCurRow() + offset);
+		}
 
 		$scope.hex = hex;
 
-		$scope.getByte = function(row: number, col: number):string {
-			var i = $scope.curRow + row*$scope.cols + col;
+		function rowStartLoc(row: number) {
+			return ($scope.getCurRow() + row) * $scope.cols;
+		}
+
+		function rowColLoc(row: number, col: number) {
+			return rowStartLoc(row) + col;
+		}
+
+		$scope.rowStartLoc = rowStartLoc;
+		$scope.rowColLoc = rowColLoc;
+
+		$scope.getByte = function(row: number, col: number):number {
+			var i = rowColLoc(row, col);
 			if (i >= $scope.mem.length) {
+				return undefined;
+			}
+			return $scope.mem[i];
+		}
+
+		$scope.getHexByte = function(row: number, col: number):string {
+			var n = $scope.getByte(row, col);
+			if (n === undefined) {
 				return "";
 			}
-			return hex($scope.mem[i], 2);
+			return hex(n, 2);
+		}
+
+		$scope.asciiOutput = function(row:number):string {
+			var startLoc = rowStartLoc(row);
+			var ret = '';
+			for (var i = 0; i < $scope.cols; i++) {
+				ret += String.fromCharCode($scope.mem[startLoc+i]);
+			}
+			return ret;
+		}
+
+		$scope.instrOutput = function(row:number):string {
+			var startLoc = rowStartLoc(row)/4;
+			var ret = [];
+			for (var i = 0; i < $scope.cols/4; i++) {
+				var word = $scope.memAs32[startLoc+i];
+				var instr = Assembler.disassembleInstruction(word);
+				ret.push(instr.indexOf(undefined) !== -1 ? "invalid" : instr);
+			}
+			return ret.join("<br>");
 		}
 		
 	}
