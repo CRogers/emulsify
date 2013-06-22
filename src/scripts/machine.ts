@@ -82,8 +82,8 @@ module Machine {
 		public rt: Register;		
 		public rd: Register;
 		public shamt: number;
-		public immediate: number;
-		public address: number;
+		public imm: number;
+		public addr: number;
 	}
 
 	export var B4 = 0xf;
@@ -110,11 +110,11 @@ module Machine {
 		}
 		else if (inst.opcode === 2 || inst.opcode === 3) {
 			inst.type = InstType.J;
-			inst.address = a & B26;
+			inst.addr = a & B26;
 		}
 		else {
 			inst.type = InstType.I;
-			inst.immediate = a & B16; // = = iiiiiiii iiiiiiii
+			inst.imm = a & B16; // = = iiiiiiii iiiiiiii
 		}
 
 		return inst;

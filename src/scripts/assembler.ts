@@ -88,7 +88,6 @@ module Assembler {
 					case RFunc.srl:
 					case RFunc.sra:
 						return op + disRegs(i.rd, i.rs) + disArg(i.shamt);
-						break;
 
 					case RFunc.mult:
 					case RFunc.multu:
@@ -105,11 +104,35 @@ module Assembler {
 
 					default:
 						return op + disRegs(i.rd, i.rs, i.rt);
-						break;
 				}
 			case InstType.I:
+				var op = Opcode[i.opcode];
+				switch (i.opcode) {
+					case Opcode.addiu:
+					case Opcode.addi:
+					case Opcode.slti:
+					case Opcode.andi:
+					case Opcode.ori:
+						return op + disRegs(i.rt, i.rs) + disArg(i.imm);
+
+					case Opcode.lui:
+						return op + disRegs(i.rt) + disArg(i.imm);
+
+					case Opcode.beq:
+					case Opcode.bne:
+						return op + disRegs(i.rs, i.rt) + disArg(i.imm);
+
+					default:
+						return op + disRegs(i.rt) + disArg(i.imm + "(" + Register[i.rs] + ")")
+				}
+
 			case InstType.J:
-				return Opcode[i.opcode];
+				return Opcode[i.opcode] + disArg(i.addr, true);
 		}
+	}
+
+	export function test(instr:string):string {
+		var i = assemble(instr + '\n');
+		return disassembleInstruction(i[0]);
 	}
 }

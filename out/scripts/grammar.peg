@@ -14,7 +14,7 @@ instr
      { return {type: 'R', mnemonic: mnemonic,  rs: rs, rt: rt, rd: rd} }
   / mnemonic:instr2reg_shift s rd:reg cs rs:reg cs shamt:num nl
      { return {type: 'R', mnemonic: mnemonic,  rs: rs, rd: rd, shamt:shamt} }
-  / mnemonic:instr2reg1imm s rs:reg cs rt:reg cs imm:num nl
+  / mnemonic:instr2reg1imm s rt:reg cs rs:reg cs imm:num nl
      { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
   / mnemonic:instr1reg1imm s rt:reg cs imm:num nl
      { return {type: 'I', mnemonic: mnemonic, rt:rt, imm:imm } }
@@ -25,7 +25,7 @@ instr
   / mnemonic:instr1reg_rs s rs:reg nl
      { return {type: 'R', mnemonic: mnemonic, rs:rs } }
   / mnemonic:instr1addr s addr:num nl
-     { return {type: 'J', mnemonic: mnemonic, rs:rs, rt:rt, addr:addr } }
+     { return {type: 'J', mnemonic: mnemonic, addr:addr } }
   / mnemonic:instr_branch s rs:reg cs rt:reg cs imm:num nl
      { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
   / mnemonic:instr_offset s rt:reg cs imm:num '(' rs:reg ')' nl
