@@ -1,14 +1,27 @@
 .hex(ng-controller='HexEditor.HexEditorCtrl')
-	button.btn.btn-primary(ng-click="incrCurRow(-1)") Next Row
 	table.hex.table.table-bordered.table-hover
 		thead
 			tr
 				td Address
-				td(ng-repeat="col in range(cols)") {{hex(col, Math.floor(cols/16))}}
-				td Output
+				td(ng-repeat="col in range(cols)") {{hex(col, Math.floor(Math.log(cols)/Math.log(16)))}}
+				td Output:
+					select(ng-model="selectedOutput")
+						option(value="ascii", ng-selected="selected") Ascii
+						option(value="instr") Instr
+
 		tbody
 			tr(ng-repeat="row in range(rows)")
 				td {{hex(rowStartLoc(row))}}
 				td(ng-repeat="col in range(cols)", style="background: rgb({{230+Math.floor(getByte(row,col)/10)}},255,255)")
-					| {{getHexByte(row, col)}}
-				td(ng-bind-html-unsafe="instrOutput(row)")
+					| {{getByteFormatBase(row, col)}}
+				td(ng-bind-html-unsafe="output(row)")
+
+	form.form-inline
+		label(for="nrows") Rows:
+			input(ng-model="rows", id="nrows", min="0", type="number")
+		label(for="ncols") Cols:
+			input(ng-model="cols", id="ncols", min="0", type="number")
+		label(for="formatBase") Base:
+			input(ng-model="formatBase", id="formatBase", min="2", max="36", type="number")
+		button.btn(ng-click="incrCurRow(-rows)") Prev
+		button.btn(ng-click="incrCurRow(rows)") Next

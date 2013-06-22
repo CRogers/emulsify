@@ -26,8 +26,12 @@ module HexEditor {
 		rowColLoc(row: number, col: number):number;
 		getByte(row: number, col: number):number;
 		getHexByte(row: number, col: number):string;
+		getByteFormatBase(row: number, col: number):string;
+		formatBase: number;
 		asciiOutput(row: number):string;
 		instrOutput(row: number):string;
+		output(row: number):string;
+		selectedOutput: string;
 	}
 
 	export function HexEditorCtrl($scope: HexEditorScope) {
@@ -76,6 +80,17 @@ module HexEditor {
 			return hex(n, 2);
 		}
 
+		$scope.getByteFormatBase = function(row: number, col: number):string {
+			var n = $scope.getByte(row, col);
+			if (n === undefined) {
+				return "";
+			}
+			var padlen = Math.ceil(Math.log(255)/Math.log($scope.formatBase));
+			return padLeft(n.toString($scope.formatBase), '0', padlen);
+		}
+
+		$scope.formatBase = 16;
+
 		$scope.asciiOutput = function(row:number):string {
 			var startLoc = rowStartLoc(row);
 			var ret = '';
@@ -95,7 +110,15 @@ module HexEditor {
 			}
 			return ret.join("<br>");
 		}
-		
+
+		$scope.output = function(row: number):string {
+			switch ($scope.selectedOutput) {
+				case 'ascii': return $scope.asciiOutput(row);
+				case 'instr': return $scope.instrOutput(row);
+			}
+		}
+
+		$scope.selectedOutput = 'ascii';
 	}
 
 }

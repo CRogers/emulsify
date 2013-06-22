@@ -5,15 +5,12 @@ html(ng-app)
 		link(rel="stylesheet", href="scripts/lib/bootstrap/css/bootstrap.min.css")
 		link(rel="stylesheet", href="styles/app.css")
 	body(ng-controller="Main.BodyCtrl")
-		.machine(ng-controller="Machine.MachineCtrl")
-			.row
+		.container-fluid.machine(ng-controller="Machine.MachineCtrl")
+			.row-fluid
 				.span12
 					h1 Emulsify
 					button.btn.btn-primary(ng-click="step()") Step
-			.row
-				.span12
-					h2 Memory:
-					div(ng-include="'hex-editor.html'")
+			.row-fluid
 				.span3
 					h2 Registers:
 
@@ -32,6 +29,9 @@ html(ng-app)
 								td {{rn}}
 								td {{Register[rn]}}
 								td {{reg[rn]}}
+				.span9
+					h2 Memory:
+					div(ng-include="'hex-editor.html'")
 
 		script(src="scripts/lib/jquery/jquery-2.0.2.min.js")
 		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")
