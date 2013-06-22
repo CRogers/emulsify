@@ -123,6 +123,7 @@ module Machine {
 	export interface MachineScope extends Main.BodyScope {
 		reg: Uint32Array;
 		mem: Uint8Array;
+		memAs16: Uint16Array;
 		memAs32: Uint32Array;
 		getPC():number;
 		setPC(number);
@@ -135,11 +136,14 @@ module Machine {
 		var PC = new Uint32Array(1);
 		var HI = new Uint32Array(1);
 		var LO = new Uint32Array(1);
-		var memBuf = new ArrayBuffer(128*4);
+		var memBuf = new ArrayBuffer(256*4);
 		var mem = new Uint8Array(memBuf);
 		var memAs16 = new Uint16Array(memBuf);
 		var memAs32 = new Uint32Array(memBuf);
 		var reg = new Uint32Array(32);
+
+		for (var i = 0; i < mem.length; i++)
+			mem[i] = Math.random()*255;
 
 		function getPC() { return PC[0]; }
 		function setPC(v) { return PC[0] = v; }
@@ -293,6 +297,7 @@ module Machine {
 		}
 
 		$scope.mem = mem;
+		$scope.memAs16 = memAs16;
 		$scope.memAs32 = memAs32;
 		$scope.reg = reg
 		$scope.getPC = getPC;

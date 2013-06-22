@@ -12,6 +12,7 @@ html(ng-app)
 		script(src="scripts/grabber.js")
 		script(src="scripts/machine.js")
 		script(src="scripts/assembler.js")
+		script(src="scripts/hex-editor.js")
 		script(src="scripts/main.js")
 	body(ng-controller="Main.BodyCtrl")
 		.container
@@ -39,14 +40,4 @@ html(ng-app)
 								td {{reg[rn]}}
 				.span3
 					h2 Memory:
-					table.table.table-bordered.table-hover
-						thead
-							tr
-								td Address
-								td Value
-						tbody
-							tr(ng-repeat="a in range(mem.length)")
-								td {{a}}
-								td {{mem[a]}}
-
-			
+					div(ng-include="'hex-editor.html'")	
