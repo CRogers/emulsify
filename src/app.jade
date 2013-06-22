@@ -13,25 +13,10 @@ html(ng-app)
 			.row-fluid
 				.span3
 					h2 Registers:
-
-					table.table.table-bordered.table-hover
-						thead
-							tr
-								td Number
-								td Name
-								td Value
-						tbody
-							tr
-								td
-								td PC
-								td {{getPC()}}
-							tr(ng-repeat="rn in range(reg.length)")
-								td {{rn}}
-								td {{Register[rn]}}
-								td {{reg[rn]}}
+					ng-include(src="'registers.html'")
 				.span9
 					h2 Memory:
-					div(ng-include="'hex-editor.html'")
+					ng-include(src="'hex-editor.html'")
 
 		script(src="scripts/lib/jquery/jquery-2.0.2.min.js")
 		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")

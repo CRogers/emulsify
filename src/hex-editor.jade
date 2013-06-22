@@ -3,7 +3,7 @@
 		thead
 			tr
 				td Address
-				td(ng-repeat="col in range(cols)") {{hex(col, Math.floor(Math.log(cols)/Math.log(16)))}}
+				td(ng-repeat="col in range(cols)") {{padMaxBase(cols,addrBase,col)}}
 				td Output:
 					select(ng-model="selectedOutput")
 						option(value="ascii", ng-selected="selected") Ascii
@@ -11,9 +11,9 @@
 
 		tbody
 			tr(ng-repeat="row in range(rows)")
-				td {{hex(rowStartLoc(row))}}
+				td {{rowStartLoc(row).toString(addrBase)}}
 				td(ng-repeat="col in range(cols)", style="background: rgb({{230+Math.floor(getByte(row,col)/10)}},255,255)")
-					| {{getByteFormatBase(row, col)}}
+					| {{getByteBase(row, col)}}
 				td(ng-bind-html-unsafe="output(row)")
 
 	form.form-inline
@@ -21,7 +21,9 @@
 			input(ng-model="rows", id="nrows", min="0", type="number")
 		label(for="ncols") Cols:
 			input(ng-model="cols", id="ncols", min="0", type="number")
-		label(for="formatBase") Base:
-			input(ng-model="formatBase", id="formatBase", min="2", max="36", type="number")
+		label(for="byteBase") Byte Base:
+			input(ng-model="byteBase", id="byteBase", min="2", max="36", type="number")
+		label(for="addrBase") Addr Base:
+			input(ng-model="addrBase", id="addrBase", min="2", max="36", type="number")
 		button.btn(ng-click="incrCurRow(-rows)") Prev
 		button.btn(ng-click="incrCurRow(rows)") Next

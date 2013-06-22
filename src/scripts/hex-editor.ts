@@ -7,27 +7,19 @@ module HexEditor {
 		return Array(Math.max(0, len + 1 - str.length)).join(pad) + str;
 	}
 
-	function hex(n: number, padlen: number = 0) {
-		var str = n.toString(16);
-		if (padlen === 0) {
-			return str;
-		}
-		return padLeft(str, "0", padlen);
-	}
-
 	export interface HexEditorScope extends Machine.MachineScope {
 		rows: number;
 		cols: number;
 		getCurRow():number;
 		setCurRow(n: number);
 		incrCurRow(offset: number);
-		hex(n: number):string;
 		rowStartLoc(row: number):number;
 		rowColLoc(row: number, col: number):number;
+		padMaxBase(max: number, base: number, n: number, pad?: string):string
 		getByte(row: number, col: number):number;
-		getHexByte(row: number, col: number):string;
-		getByteFormatBase(row: number, col: number):string;
-		formatBase: number;
+		getByteBase(row: number, col: number):string;
+		byteBase: number;
+		addrBase: number;
 		asciiOutput(row: number):string;
 		instrOutput(row: number):string;
 		output(row: number):string;
@@ -51,8 +43,6 @@ module HexEditor {
 			$scope.setCurRow($scope.getCurRow() + offset);
 		}
 
-		$scope.hex = hex;
-
 		function rowStartLoc(row: number) {
 			return ($scope.getCurRow() + row) * $scope.cols;
 		}
@@ -72,24 +62,22 @@ module HexEditor {
 			return $scope.mem[i];
 		}
 
-		$scope.getHexByte = function(row: number, col: number):string {
+		function padMaxBase(max: number, base: number, n: number, pad: string = '0'):string {
+			var padlen = Math.ceil(Math.log(max)/Math.log(base));
+			return padLeft(n.toString(base), pad, padlen);
+		}
+		$scope.padMaxBase = padMaxBase;
+
+		$scope.getByteBase = function(row: number, col: number):string {
 			var n = $scope.getByte(row, col);
 			if (n === undefined) {
 				return "";
 			}
-			return hex(n, 2);
+			return $scope.padMaxBase(255, $scope.byteBase, n);
 		}
 
-		$scope.getByteFormatBase = function(row: number, col: number):string {
-			var n = $scope.getByte(row, col);
-			if (n === undefined) {
-				return "";
-			}
-			var padlen = Math.ceil(Math.log(255)/Math.log($scope.formatBase));
-			return padLeft(n.toString($scope.formatBase), '0', padlen);
-		}
-
-		$scope.formatBase = 16;
+		$scope.byteBase = 16;
+		$scope.addrBase = 16;
 
 		$scope.asciiOutput = function(row:number):string {
 			var startLoc = rowStartLoc(row);

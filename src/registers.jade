@@ -1,0 +1,19 @@
+.regs
+	table.table.table-bordered.table-hover
+		thead
+			tr
+				td Name
+				td Value
+				td Name
+				td Value
+		tbody
+			tr
+				td PC
+				td {{getPC()}}
+				td
+				td
+			tr(ng-repeat="rn in range(reg.length/2)")
+				td {{Register[rn]}}
+				td {{reg[rn]}}
+				td {{Register[rn+reg.length/2]}}
+				td {{reg[rn+reg.length/2]}}
