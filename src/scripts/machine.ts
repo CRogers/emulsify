@@ -137,6 +137,7 @@ module Machine {
 		var LO = new Uint32Array(1);
 		var memBuf = new ArrayBuffer(128*4);
 		var mem = new Uint8Array(memBuf);
+		var memAs16 = new Uint16Array(memBuf);
 		var memAs32 = new Uint32Array(memBuf);
 		var reg = new Uint32Array(32);
 
@@ -144,55 +145,141 @@ module Machine {
 		function setPC(v) { return PC[0] = v; }
 		function incrPC(i) { return PC[0] += i; }
 
+		function getReg(r: number): number {
+			return reg[r];
+		}
+
+		function setReg(r: number, value: number) {
+			if (r === 0) return;
+			reg[r] = value;
+		}
+
+		function getByte(i: number):number {
+			return mem[i];
+		}
+
+		function setByte(i: number, value: number) {
+			mem[i] = value;
+		}
+
+		function getHalf(i: number):number {
+			return memAs16[i >>> 1];
+		}
+
+		function setHalf(i: number, value: number) {
+			memAs16[i >>> 1] = value;
+		}
+
+		function getWord(i: number):number {
+			return memAs32[i >>> 2];
+		}
+
+		function setWord(i: number, value: number) {
+			memAs32[i >>> 2] = value;
+		} 
+
 		function executeInstruction(i: Inst) {
+			var advancePC = true;
 			if (i.type === InstType.R) {
 				switch (i.rfunc) {
-					case RFunc.sll: reg[i.rd] = reg[i.rs] << i.shamt; break;
-					case RFunc.srl: reg[i.rd] = reg[i.rs] >> i.shamt; break;
-					case RFunc.sra: reg[i.rd] = reg[i.rs] >>> i.shamt; break; 
-					case RFunc.sllv: reg[i.rd] = reg[i.rs] << reg[i.rt]; break;
-					case RFunc.srlv: reg[i.rd] = reg[i.rs] >> reg[i.rt]; break;
-					case RFunc.srav: reg[i.rd] = reg[i.rs] >>> reg[i.rt]; break;
+					case RFunc.sll: setReg(i.rd, getReg(i.rs) << i.shamt); break;
+					case RFunc.srl: setReg(i.rd, getReg(i.rs) >> i.shamt); break;
+					case RFunc.sra: setReg(i.rd, getReg(i.rs) >>> i.shamt); break; 
+					case RFunc.sllv: setReg(i.rd, getReg(i.rs) << getReg(i.rt)); break;
+					case RFunc.srlv: setReg(i.rd, getReg(i.rs) >> getReg(i.rt)); break;
+					case RFunc.srav: setReg(i.rd, getReg(i.rs) >>> getReg(i.rt)); break;
 
-					case RFunc.jr: PC[0] = reg[i.rs]; break;
+					case RFunc.jr: PC[0] = getReg(i.rs); break;
 					case RFunc.jalr:
 						reg[Register.ra] = PC[0]+4;
-						PC[0] = reg[i.rs];
+						PC[0] = getReg(i.rs);
 						break;
 
-					case RFunc.mfhi: reg[i.rd] = HI[0]; break;
-					case RFunc.mflo: reg[i.rd] = LO[0]; break;
+					case RFunc.mfhi: setReg(i.rd, HI[0]); break;
+					case RFunc.mflo: setReg(i.rd, LO[0]); break;
 
 					case RFunc.mult:					
 					case RFunc.multu:
-						var res = new Long(reg[i.rs]).multiply(new Long(reg[i.rt]));
+						var res = new Long(getReg(i.rs)).multiply(new Long(getReg(i.rt)));
 						LO[0] = res.getLowBits();
 						HI[0] = res.getHighBits();
 						break;
 
 					case RFunc.div:
 					case RFunc.divu:
-						LO[0] = reg[i.rs]/reg[i.rt];
-						HI[0] = reg[i.rs]%reg[i.rt];
+						LO[0] = getReg(i.rs)/getReg(i.rt);
+						HI[0] = getReg(i.rs)%getReg(i.rt);
 						break;
 
 					case RFunc.addu:
 					case RFunc.add:
-						reg[i.rd] = reg[i.rs] + reg[i.rt]; 
+						setReg(i.rd, getReg(i.rs) + getReg(i.rt)); 
 						break;
 
 					case RFunc.sub:
 					case RFunc.subu:
-						reg[i.rd] = reg[i.rs] - reg[i.rt]; 
+						setReg(i.rd, getReg(i.rs) - getReg(i.rt)); 
 						break;
 
-					case RFunc.and: reg[i.rd] = reg[i.rs] & reg[i.rt]; break;
-					case RFunc.or:  reg[i.rd] = reg[i.rs] | reg[i.rt]; break;
-					case RFunc.xor: reg[i.rd] = reg[i.rs] ^ reg[i.rt]; break;
-					case RFunc.nor: reg[i.rd] = ~(reg[i.rs] | reg[i.rt]); break;
+					case RFunc.and: setReg(i.rd, getReg(i.rs) & getReg(i.rt)); break;
+					case RFunc.or:  setReg(i.rd, getReg(i.rs) | getReg(i.rt)); break;
+					case RFunc.xor: setReg(i.rd, getReg(i.rs) ^ getReg(i.rt)); break;
+					case RFunc.nor: setReg(i.rd, ~(getReg(i.rs) | getReg(i.rt))); break;
 
-					case RFunc.slt: reg[i.rd] = (reg[i.rs] < reg[i.rt]) ? 1 : 0; break;
-					//case RFunc.sltu: reg[i.rd] = (reg[i.rs] < reg[i.rt]) ? 1 : 0; break;
+					case RFunc.slt: setReg(i.rd, (getReg(i.rs) < getReg(i.rt)) ? 1 : 0); break;
+					//case RFunc.sltu: setReg(i.rd, (getReg(i.rs) < getReg(i.rt)) ? 1 : 0); break;
+				}
+			}
+			else {
+				switch (i.opcode) {
+					case Opcode.j:
+						PC[0] = (PC[0] & 0xf0000000) | (i.addr << 2);
+						advancePC = false;
+						break;
+					case Opcode.jal:
+						reg[Register.ra] = PC[0]+4;
+						PC[0] = (PC[0] & 0xf0000000) | (i.addr << 2);
+						advancePC = false;
+						break;
+
+					case Opcode.beq:
+						if (getReg(i.rs) === getReg(i.rt)) {
+							PC[0] += i.addr << 2;
+							advancePC = false;
+						}
+						break;
+					case Opcode.bne:
+						if (getReg(i.rs) !== getReg(i.rt)) {
+							PC[0] += i.addr << 2;
+							advancePC = false;
+						}
+						break;
+
+					case Opcode.addi:
+					case Opcode.addiu:
+						setReg(i.rt, getReg(i.rs) + i.imm);
+						break;
+
+					case Opcode.slti: setReg(i.rt, (getReg(i.rs) < i.imm) ? 1 : 0); break;
+					case Opcode.andi: setReg(i.rt, getReg(i.rs) & i.imm); break;
+					case Opcode.ori:  setReg(i.rt, getReg(i.rs) | i.imm); break;
+					case Opcode.lui:  setReg(i.rt, i.imm << 16); break;
+
+					case Opcode.lbu:
+					case Opcode.lb:
+						setReg(i.rt, getByte(getReg(i.rs)+i.imm));
+						break;
+
+					case Opcode.lhu:
+					case Opcode.lh:
+						setReg(i.rt, getHalf(getReg(i.rs)+i.imm));
+						break;
+
+					case Opcode.lw: setReg(i.rt, getWord(getReg(i.rs)+i.imm)); break;
+					case Opcode.sb: setByte(getReg(i.rs)+i.imm, i.rt); break;
+					case Opcode.sh: setHalf(getReg(i.rs)+i.imm, i.rt); break;
+					case Opcode.sw: setWord(getReg(i.rs)+i.imm, i.rt); break;
+
 				}
 			}		
 		}
