@@ -60,9 +60,7 @@ app.get('/scripts/:name.js', function(req, res) {
 	var loc = nloc + '.ts';
 	var intermediateOut = nloc + '.js';
 	var outloc = path.join(SCRIPTS_OUT_DIR, req.params.name) + '.js';
-	runProcess(res, 'tsc', loc, outloc, function(){
-		fs.renameSync(intermediateOut, outloc);
-	});
+	runProcess(res, 'tsc --out ' + SCRIPTS_OUT_DIR, loc, outloc);
 });
 
 app.configure(function(){

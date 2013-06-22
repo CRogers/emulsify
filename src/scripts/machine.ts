@@ -7,7 +7,7 @@ module Machine {
 	var Long = goog.math.Long;
 
 	export enum Register {
-		zero,
+		z,
 		at,
 		v0, v1,
 		a0, a1, a2, a3,
@@ -22,67 +22,52 @@ module Machine {
 	}
 
 	export enum RFunc {
-		sll,           // 00
-		_z01 = 0x1, 
-		srl,           // 02
-		sra,           // 03
-		sllv,          // 04
-		_z05 = 0x5,
-		srlv,          // 06
-		srav,          // 07
-		jr,            // 08
-		jalr,          // 09
-		_z0f = 0x0f,
-		mfhi,          // 10
-		_z11 = 0x11,
-		mflo,          // 12
-		_z17 = 0x17,
-		mult,          // 18
-		multu,         // 19
-		div,           // 1a
-		divu,          // 1b
-		_z1a = 0x1a,
-		add,           // 20
-		addu,          // 21
-		sub,           // 22
-		subu,          // 23
-		and,           // 24
-		or,            // 25 
-		xor,           // 26
-		nor,           // 27
-		_z29 = 0x29,
-		slt,           // 2a
-		sltu           // 2b
+		sll = 0x00,
+		srl = 0x02,
+		sra = 0x03,
+		sllv = 0x04,
+		srlv = 0x06,
+		srav = 0x07,
+		jr = 0x08,
+		jalr = 0x09,
+		mfhi = 0x10,
+		mflo = 0x12,
+		mult = 0x18,
+		multu = 0x19,
+		div = 0x1a,
+		divu = 0x1b,
+		add = 0x20,
+		addu = 0x21,
+		sub = 0x22,
+		subu = 0x23,
+		and = 0x24,
+		or = 0x25, 
+		xor = 0x26,
+		nor = 0x27,
+		slt = 0x2a,
+		sltu = 0x2b,
 	}
 
 	export enum Opcode {
-		arith,         // 00
-		_z01 = 0x01,
-		j,             // 02
-		jal,           // 03
-		beq,           // 04
-		bne,           // 05
-		_z07 = 0x07,
-		addi,          // 08
-		addiu,         // 09
-		slti,          // 0a
-		_z0b = 0x0b,
-		andi,          // 0c
-		ori,           // 0d
-		_z0e = 0x0e,
-		lui,           // 0f
-		_z1f = 0x1f,
-		lb,            // 20
-		lh,            // 21
-		_z22 = 0x22,
-		lw,            // 23
-		lbu,           // 24
-		lhu,           // 25
-		_z27 = 0x27,
-		sb,            // 28
-		sh,            // 29
-		_z2a = 0x2a,
-		sw             // 2b
+		arith = 0x00,
+		j = 0x02,
+		jal = 0x03,
+		beq = 0x04,
+		bne = 0x05,
+		addi = 0x08,
+		addiu = 0x09,
+		slti = 0x0a,
+		andi = 0x0c,
+		ori = 0x0d,
+		lui = 0x0f,
+		lb = 0x20,
+		lh = 0x21,
+		lw = 0x23,
+		lbu = 0x24,
+		lhu = 0x25,
+		sb = 0x28,
+		sh = 0x29,
+		sw = 0x2b,
 	}
 
 	export enum InstType {
@@ -101,11 +86,11 @@ module Machine {
 		public address: number;
 	}
 
-	var B4 = 0xf;
-	var B5 = 0x1f;
-	var B6 = 0x3f;
-	var B16 = 0xffff;
-	var B26 = 0x3ffffff;
+	export var B4 = 0xf;
+	export var B5 = 0x1f;
+	export var B6 = 0x3f;
+	export var B16 = 0xffff;
+	export var B26 = 0x3ffffff;
 
 	export function decodeInstruction(word: number): Inst {
 		var a = word;

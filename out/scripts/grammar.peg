@@ -11,29 +11,30 @@ instrs
 
 instr 
   = mnemonic:instr3reg s rd:reg cs rs:reg cs rt:reg nl
-     { return {mnemonic: mnemonic,  rs: rs, rt: rt, rd: rd} }
+     { return {type: 'R', mnemonic: mnemonic,  rs: rs, rt: rt, rd: rd} }
+  / mnemonic:instr2reg_shift s rd:reg cs rs:reg cs shamt:num nl
+     { return {type: 'R', mnemonic: mnemonic,  rs: rs, rd: rd, shamt:shamt} }
   / mnemonic:instr2reg1imm s rs:reg cs rt:reg cs imm:num nl
-     { return {mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
+     { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
   / mnemonic:instr1reg1imm s rt:reg cs imm:num nl
-     { return {mnemonic: mnemonic, rt:rt, imm:imm } }
+     { return {type: 'I', mnemonic: mnemonic, rt:rt, imm:imm } }
   / mnemonic:instr2reg s rs:reg cs rt:reg nl
-     { return {mnemonic: mnemonic, rs:rs, rt:rt } }
+     { return {type: 'R', mnemonic: mnemonic, rs:rs, rt:rt } }
   / mnemonic:instr1reg_rd s rd:reg nl
-     { return {mnemonic: mnemonic, rd:rd } }
+     { return {type: 'R', mnemonic: mnemonic, rd:rd } }
   / mnemonic:instr1reg_rs s rs:reg nl
-     { return {mnemonic: mnemonic, rs:rs } }
+     { return {type: 'R', mnemonic: mnemonic, rs:rs } }
+  / mnemonic:instr1addr s addr:num nl
+     { return {type: 'J', mnemonic: mnemonic, rs:rs, rt:rt, addr:addr } }
   / mnemonic:instr_branch s rs:reg cs rt:reg cs imm:num nl
-     { return {mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
+     { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
   / mnemonic:instr_offset s rt:reg cs imm:num '(' rs:reg ')' nl
-     { return {mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
+     { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
 
 instr3reg
 	= mnemonic:('sllv'
-	/ 'sll'
 	/ 'srlv'
-	/ 'srl'
 	/ 'srav'
-	/ 'sra'
 	/ 'addu'
 	/ 'add'
 	/ 'subu'
@@ -44,6 +45,11 @@ instr3reg
 	/ 'nor'
 	/ 'sltu'
 	/ 'slt') { return mnemonic }
+
+instr2reg_shift
+	= mnemonic:('sll'
+	/ 'srl'
+	/ 'sra') { return mnemonic }
 
 instr2reg1imm
 	= mnemonic:('addiu'
@@ -56,22 +62,21 @@ instr1reg1imm
 	= mnemonic:'lui' {return mnemonic}
 
 instr2reg
-	= mnemonic:('mult'
-	/ 'multu'
-	/ 'div'
-	/ 'divu') { return mnemonic }
+	= mnemonic:('multu'
+	/ 'mult'
+	/ 'divu'
+	/ 'div') { return mnemonic }
 
 instr1reg_rd
 	= mnemonic:('mfhi'
-	/ 'mflo'
-	/ 'jr') { return mnemonic }
+	/ 'mflo') { return mnemonic }
 
 instr1reg_rs
 	= mnemonic:'jr' { return mnemonic }
 
 instr1addr
-	= mnemonic:('j'
-	/ 'jal') { return mnemonic }
+	= mnemonic:('jal'
+	/ 'j') { return mnemonic }
 
 instr_branch
 	= mnemonic:('beq'
@@ -80,11 +85,11 @@ instr_branch
 	/*/ 'jalr' */
 
 instr_offset
-	= mnemonic:('lb'
-	/ 'lh'
-	/ 'lw'
-	/ 'lbu'
+	= mnemonic:('lbu'
 	/ 'lhu'
+	/ 'lw'
+	/ 'lb'
+	/ 'lh'
 	/ 'sb'
 	/ 'sh'
 	/ 'sw') {return mnemonic}
