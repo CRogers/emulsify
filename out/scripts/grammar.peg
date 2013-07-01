@@ -3,32 +3,36 @@ start = instrs
 s = (' '/'\t')*
 cs = s ',' s
 num = n:[0-9]+ { return parseInt(n.join('')) }
-nl = '\r'? '\n'
+nl = [\n\r]+
 nls = s nl [\n\r \t]*
 
 instrs
-  = is:instr* { return is }
+  = is:(i:instr nls { return i })* js:instrOrEmpty { return is.concat(js) }
+
+instrOrEmpty
+  = i:instr { return [i] }
+  / s { return [] }
 
 instr 
-  = mnemonic:instr3reg s rd:reg cs rs:reg cs rt:reg nl
+  = mnemonic:instr3reg s rd:reg cs rs:reg cs rt:reg
      { return {type: 'R', mnemonic: mnemonic,  rs: rs, rt: rt, rd: rd} }
-  / mnemonic:instr2reg_shift s rd:reg cs rs:reg cs shamt:num nl
+  / mnemonic:instr2reg_shift s rd:reg cs rs:reg cs shamt:num
      { return {type: 'R', mnemonic: mnemonic,  rs: rs, rd: rd, shamt:shamt} }
-  / mnemonic:instr2reg1imm s rt:reg cs rs:reg cs imm:num nl
+  / mnemonic:instr2reg1imm s rt:reg cs rs:reg cs imm:num
      { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
-  / mnemonic:instr1reg1imm s rt:reg cs imm:num nl
+  / mnemonic:instr1reg1imm s rt:reg cs imm:num
      { return {type: 'I', mnemonic: mnemonic, rt:rt, imm:imm } }
-  / mnemonic:instr2reg s rs:reg cs rt:reg nl
+  / mnemonic:instr2reg s rs:reg cs rt:reg
      { return {type: 'R', mnemonic: mnemonic, rs:rs, rt:rt } }
-  / mnemonic:instr1reg_rd s rd:reg nl
+  / mnemonic:instr1reg_rd s rd:reg
      { return {type: 'R', mnemonic: mnemonic, rd:rd } }
-  / mnemonic:instr1reg_rs s rs:reg nl
+  / mnemonic:instr1reg_rs s rs:reg
      { return {type: 'R', mnemonic: mnemonic, rs:rs } }
-  / mnemonic:instr1addr s addr:num nl
+  / mnemonic:instr1addr s addr:num
      { return {type: 'J', mnemonic: mnemonic, addr:addr } }
-  / mnemonic:instr_branch s rs:reg cs rt:reg cs imm:num nl
+  / mnemonic:instr_branch s rs:reg cs rt:reg cs imm:num
      { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
-  / mnemonic:instr_offset s rt:reg cs imm:num '(' rs:reg ')' nl
+  / mnemonic:instr_offset s rt:reg cs imm:num '(' rs:reg ')'
      { return {type: 'I', mnemonic: mnemonic, rs:rs, rt:rt, imm:imm } }
 
 instr3reg
@@ -95,7 +99,7 @@ instr_offset
 	/ 'sw') {return mnemonic}
 
 reg
-	= name:('zero'
+	= name:('z'
 	/ 'at'
 	/ 'v0' / 'v1'
 	/ 'a0' / 'a1' / 'a2' / 'a3'

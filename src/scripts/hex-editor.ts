@@ -1,3 +1,4 @@
+/// <reference path="init.ts" />
 /// <reference path="machine.ts" />
 /// <reference path="assembler.ts" />
 
@@ -26,10 +27,10 @@ module HexEditor {
 		selectedOutput: string;
 	}
 
-	export function HexEditorCtrl($scope: HexEditorScope) {
+	emulsify.controller('HexEditorCtrl', function ($scope: HexEditorScope) {
 		$scope.cols = 16;
-		$scope.rows = 24;
-		var curRow = 10;
+		$scope.rows = 6;
+		var curRow = 0;
 
 		$scope.getCurRow = function():number {
 			return curRow;
@@ -83,7 +84,11 @@ module HexEditor {
 			var startLoc = rowStartLoc(row);
 			var ret = '';
 			for (var i = 0; i < $scope.cols; i++) {
-				ret += String.fromCharCode($scope.mem[startLoc+i]);
+				var b = $scope.mem[startLoc+i];
+				if (b >= 32 && b <= 126)
+					ret += String.fromCharCode(b);
+				else
+					ret += ".";
 			}
 			return ret;
 		}
@@ -106,7 +111,7 @@ module HexEditor {
 			}
 		}
 
-		$scope.selectedOutput = 'ascii';
-	}
+		$scope.selectedOutput = 'instr';
+	});
 
 }

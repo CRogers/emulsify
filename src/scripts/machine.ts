@@ -1,3 +1,4 @@
+/// <reference path="init.ts" />
 /// <reference path="main.ts" />
 
 declare var goog;
@@ -122,6 +123,8 @@ module Machine {
 
 	export interface MachineScope extends Main.BodyScope {
 		reg: Uint32Array;
+		HI: Uint32Array;
+		LO: Uint32Array;
 		mem: Uint8Array;
 		memAs16: Uint16Array;
 		memAs32: Uint32Array;
@@ -132,7 +135,7 @@ module Machine {
 		Register: any;
 	}
 
-	export function MachineCtrl($scope: MachineScope) {
+	emulsify.controller('MachineCtrl', function($scope: MachineScope) {
 		var PC = new Uint32Array(1);
 		var HI = new Uint32Array(1);
 		var LO = new Uint32Array(1);
@@ -290,7 +293,7 @@ module Machine {
 
 
 		function step() {
-			var instWord = mem[PC[0]];
+			var instWord = memAs32[PC[0]/4];
 			var inst = decodeInstruction(instWord);
 			executeInstruction(inst);
 			incrPC(4);
@@ -300,9 +303,11 @@ module Machine {
 		$scope.memAs16 = memAs16;
 		$scope.memAs32 = memAs32;
 		$scope.reg = reg
+		$scope.HI = HI;
+		$scope.LO = LO;
 		$scope.getPC = getPC;
 		$scope.Register = Register;
 		$scope.step = step;
-	}
+	});
 
 }

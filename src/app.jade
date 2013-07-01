@@ -1,15 +1,20 @@
 !!! 5
-html(ng-app)
+html(ng-app="emulsify")
 	head
 		title Emulsify
 		link(rel="stylesheet", href="scripts/lib/bootstrap/css/bootstrap.min.css")
 		link(rel="stylesheet", href="styles/app.css")
-	body(ng-controller="Main.BodyCtrl")
-		.container-fluid.machine(ng-controller="Machine.MachineCtrl")
+		script(src="scripts/lib/jquery/jquery-2.0.2.min.js")
+		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")
+	body(ng-controller="BodyCtrl")
+		.container-fluid.machine(ng-controller="MachineCtrl")
 			.row-fluid
 				.span12
 					h1 Emulsify
 					button.btn.btn-primary(ng-click="step()") Step
+			.row-fluid
+				.span6
+					ng-include(src="'asm-input.html'")
 			.row-fluid
 				.span3
 					h2 Registers:
@@ -18,13 +23,16 @@ html(ng-app)
 					h2 Memory:
 					ng-include(src="'hex-editor.html'")
 
-		script(src="scripts/lib/jquery/jquery-2.0.2.min.js")
-		script(src="scripts/lib/bootstrap/js/bootstrap.min.js")
-		script(src="scripts/lib/angularjs/angular.min.js", async)
+		script(src="scripts/lib/angularjs/angular.min.js")
 		script(src="scripts/lib/closure/long.js", async)
 		script(src="scripts/lib/peg.js/peg.min.js", async)
+		script(src="scripts/lib/ace/ace.min.js")
+		script(src="scripts/lib/angularjs/angular-ace.js")
+
+		script(src="scripts/init.js")
 		script(src="scripts/grabber.js")
 		script(src="scripts/machine.js")
 		script(src="scripts/assembler.js")
 		script(src="scripts/hex-editor.js")
+		script(src="scripts/asm-input.js")
 		script(src="scripts/main.js")

@@ -1,11 +1,15 @@
+/// <reference path="libdefs/angularjs/angular.d.ts" />
+/// <reference path="libdefs/jquery/jquery.d.ts" />
+
 module Main {
 
-	export interface BodyScope {
+	export interface BodyScope extends ng.IScope {
 		Math: any;
 		range(number): number[];
 	}
 
-	export function BodyCtrl($scope: BodyScope) {
+	angular.module('emulsify')
+	.controller('BodyCtrl', function ($scope: BodyScope) {
 		$scope.Math = Math;
 
 		$scope.range = function(n) {
@@ -15,6 +19,6 @@ module Main {
 			}
 			return arr;
 		}
-	}
+	});
 
 }
